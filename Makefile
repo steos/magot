@@ -2,12 +2,12 @@ override CFLAGS += -Wall -Wextra -pedantic -std=c99 -I.
 
 PREFIX = /usr/local
 
-.PHONY: all clean
-
+.PHONY: all
 all: libmagot.so libmagot.a demo
 
+.PHONY: clean
 clean:
-	rm -f *.so *.o *.a demo
+	rm -f *.so *.o *.a demo README.html
 
 install: libmagot.so libmagot.a
 	cp magot.h $(PREFIX)/include
@@ -21,4 +21,10 @@ libmagot.a: magot.o
 
 demo: demo.o magot.o
 demo.o: magot.o
+
+%.html: %.md
+	pandoc -f markdown -t html -s $< > $@
+
+.PHONY: doc
+doc: README.html
 
