@@ -8,10 +8,6 @@ Magot is a minimal library for command line argument parsing. The main
 objective is to provide basic argument handling capabilities with a
 minimal amount of setup code.
 
-The API is not finalized therefore the soname will _not_ change on BC
-breaks until it is (if ever). No warranty. No support. Use at own
-risk.
-
 The code is strict C99 and should build fine with any compliant C
 compiler without any warnings. The Makefile targets GNU Make >= 3.80.
 
@@ -23,6 +19,13 @@ The current functionality is pretty minimal. There is no support for
 collecting remaining arguments, no concept of short or long options,
 no support for aliases, flag clusters, custom argument separators,
 multi-valued arguments, etc.
+
+The API is not finalized therefore the soname will _not_ change on BC
+breaks until it is (if ever - just link to it statically if you are
+crazy enough to actually use it).
+
+This is first and foremost my private toy. No warranty. No
+support. Use at own risk. Yada yada.
 
 ## Why?
 
@@ -86,8 +89,7 @@ Note that by default the CFLAGS don't specify any optimizations. If you want an 
 
 ## Use?
 
-Do whatever the fuck you want to under the terms of the
-[WTFPL][1]. But don't come whining to me if it breaks (and it
-will). Good luck.
+[Do whatever the fuck you want to][1]. But don't come whining to me if
+it breaks (and it will). Good luck.
 
 [1]: http://www.wtfpl.net/
