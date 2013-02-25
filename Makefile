@@ -1,4 +1,4 @@
-override CFLAGS += -Wall -Wextra -pedantic -std=c99 -I.
+override CFLAGS += -Wall -Wextra -pedantic -std=c99 -I. -fPIC
 
 PREFIX = /usr/local
 
@@ -14,7 +14,7 @@ install: libmagot.so libmagot.a
 	cp libmagot.so libmagot.a $(PREFIX)/lib
 
 libmagot.so: magot.o
-	$(CC) $(CFLAGS) -shared -Wl,-soname,$@ -fPIC -o $@
+	$(LINK.c) -shared -Wl,-soname,$@ -fPIC -o $@ $<
 
 libmagot.a: magot.o
 	$(AR) $(ARFLAGS) $@ $^
