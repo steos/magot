@@ -35,13 +35,6 @@ magot_t *find_opt(int optc, magot_t **opts, char *name) {
   return NULL;
 }
 
-char *errmsg(char *msg, char *name) {
-  char *buf = malloc(strlen(msg) + strlen(name));
-  strcat(buf, msg);
-  strcat(buf, name);
-  return buf;
-}
-
 bool magot_parse(magot_err_t *err, int argc,
 		 char **argv, int optc, magot_t **optv) {
   for (int i = 1; i < argc; ++i) {
