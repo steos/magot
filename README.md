@@ -1,6 +1,6 @@
 # magot
 
-*M* agot *a* in't *g* et *o* p *t*.
+<b>M</b>agot <b>a</b>in't <b>g</b>et<b>o</b>p<b>t</b>.
 
 ## What?
 
