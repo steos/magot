@@ -33,7 +33,7 @@ Getopt makes me want to gouge my eyes out.
     #include <magot.h>
     int main(int argc, char **argv) {
       magot_t foo, bar, baz;
-        magot_t *opts[] = {
+      magot_t *opts[] = {
         magot_init_opt(&foo, "-f", true, "foo option"),
         magot_init_opt(&bar, "-b", false, "bar option"),
         magot_init_flag(&baz, "-z", "baz flag")
