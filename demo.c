@@ -1,3 +1,15 @@
+/* This file is part of magot.
+ *
+ * Magot is free software. You can redistribute it and/or modify it
+ * under the terms of the Do What The Fuck You Want To Public License,
+ * Version 2, as published by Sam Hocevar. See http://www.wtfpl.net/
+ * for more details.
+ *
+ * Magot is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.
+ */
+
 #include <magot.h>
 #include <stdio.h>
 #include <string.h>
@@ -33,7 +45,7 @@ int main(int argc, char **argv) {
   if (!success) {
     printf("%s: %s\n", magot_errstr(&err), err.arg);
     return 1;
-  }  
+  }
 
   printf("foo option: %s\n", foo.value);
   if (magot_isset(&bar)) {

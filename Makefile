@@ -1,3 +1,14 @@
+# This file is part of magot.
+#
+# Magot is free software. You can redistribute it and/or modify it
+# under the terms of the Do What The Fuck You Want To Public License,
+# Version 2, as published by Sam Hocevar. See http://www.wtfpl.net/
+# for more details.
+#
+# Magot is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.
+
 override CFLAGS += -Wall -Wextra -pedantic -std=c99 -I. -fPIC
 
 PREFIX = /usr/local
