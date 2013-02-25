@@ -9,22 +9,34 @@ all: libmagot.so libmagot.a demo
 clean:
 	rm -f *.so *.o *.a demo README.html
 
-install: libmagot.so libmagot.a
+install: libmagot.so libmagot.a magot.h
 	cp magot.h $(PREFIX)/include
 	cp libmagot.so libmagot.a $(PREFIX)/lib
 
-libmagot.so: magot.o
-	$(LINK.c) -shared -Wl,-soname,$@ -fPIC -o $@ $<
+install-links: libmagot.so libmagot.a magot.h
+	ln -sf $(shell readlink -e ./magot.h) $(PREFIX)/include/magot.h
+	ln -sf $(shell readlink -e ./libmagot.a) $(PREFIX)/lib/libmagot.a
+	ln -sf $(shell readlink -e ./libmagot.so) $(PREFIX)/lib/libmagot.so
 
-libmagot.a: magot.o
-	$(AR) $(ARFLAGS) $@ $^
+.PHONY: uninstall
+uninstall:
+	rm -f $(PREFIX)/include/magot.h \
+	$(PREFIX)/lib/libmagot.*
+
 
 demo: demo.o magot.o
 demo.o: magot.o
 
-%.html: %.md
-	pandoc -f markdown -t html -s $< > $@
-
 .PHONY: doc
 doc: README.html
 
+# -- general rules
+
+%.html: %.md
+	pandoc -f markdown -t html -s $< > $@
+
+lib%.so: %.o
+	$(LINK.c) -shared -Wl,-soname,$@ -fPIC -o $@ $<
+
+lib%.a: %.o
+	$(AR) $(ARFLAGS) $@ $^
