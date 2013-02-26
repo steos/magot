@@ -26,7 +26,10 @@ magot_t *magot_init(magot_t *opt,
 		    bool flag,
 		    bool required,
 		    char *help) {
-  assert(!flag || !required);
+  assert(!flag || !required
+	 && "a flag cannot be required");
+  assert(!str_empty(name) || !str_empty(short_name)
+	 && "option must have non-empty name");
   opt->name = name;
   opt->short_name = short_name;
   opt->flag = flag;
@@ -37,19 +40,19 @@ magot_t *magot_init(magot_t *opt,
   return opt;
 }
 
-magot_t *magot_init_flag(magot_t *opt,
-			 char *name,
-			 char *short_name,
-			 char *help) {
+magot_t *magot_flag(magot_t *opt,
+		    char *name,
+		    char *short_name,
+		    char *help) {
   return magot_init(opt, name, short_name,
 		    true, false, help);
 }
 
-magot_t *magot_init_opt(magot_t *opt,
-			char *name,
-			char *short_name,
-			bool required,
-			char *help) {
+magot_t *magot_opt(magot_t *opt,
+		   char *name,
+		   char *short_name,
+		   bool required,
+		   char *help) {
   return magot_init(opt, name, short_name,
 		    false, required, help);
 }

@@ -55,16 +55,16 @@ magot_t *magot_init(magot_t *opt,
 		    bool required,
 		    char *help);
 
-magot_t *magot_init_opt(magot_t *opt,
-			char *name,
-			char *short_name,
-			bool required,
-			char *help);
+magot_t *magot_opt(magot_t *opt,
+		   char *name,
+		   char *short_name,
+		   bool required,
+		   char *help);
 
-magot_t *magot_init_flag(magot_t *opt,
-			 char *name,
-			 char *short_name,
-			 char *help);
+magot_t *magot_flag(magot_t *opt,
+		    char *name,
+		    char *short_name,
+		    char *help);
 
 bool magot_parse(int argc, char **argv,
 		 int optc, magot_t **optv,

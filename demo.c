@@ -26,13 +26,13 @@ void print_usage(int optc, magot_t **optv, magot_style_t style) {
 int main(int argc, char **argv) {
   magot_t foo, bar, baz, quux, lorem;
   magot_t *opts[] = {
-    magot_init_opt(&foo, "foo", "f", true,
-		   "the foo option. 'tis required."),
-    magot_init_opt(&bar, "bar", "b", false,
-		   "the bar option. 'tis optional."),
-    magot_init_flag(&baz, "baz", "z", "a useless flag"),
-    magot_init_flag(&quux, "", "q", "the quux flag"),
-    magot_init_flag(&lorem, "lorem-ipsum", NULL, "lorem ipsum flag")
+    magot_opt(&foo, "foo", "f", true,
+	      "the foo option. 'tis required."),
+    magot_opt(&bar, "bar", "b", false,
+	      "the bar option. 'tis optional."),
+    magot_flag(&baz, "baz", "z", "a useless flag"),
+    magot_flag(&quux, "", "q", "the quux flag"),
+    magot_flag(&lorem, "lorem-ipsum", NULL, "lorem ipsum flag")
   };
   int optc = sizeof(opts) / sizeof(opts[0]);
   foo.arg_name = "file";

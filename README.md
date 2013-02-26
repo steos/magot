@@ -45,10 +45,10 @@ Getopt makes me want to gouge my eyes out.
     int main(int argc, char **argv) {
       magot_t foo, bar, baz, quux;
       magot_t *opts[] = {
-        magot_init_opt(&foo, "foo", "f", true, "foo option"),
-        magot_init_opt(&bar, "bar", "b", false, "bar option"),
-        magot_init_flag(&baz, "baz", "z", "baz flag"),
-        magot_init_flag(&quux, "quux", "q", "quux flag")
+        magot_opt(&foo, "foo", "f", true, "foo option"),
+        magot_opt(&bar, "bar", "b", false, "bar option"),
+        magot_flag(&baz, "baz", "z", "baz flag"),
+        magot_flag(&quux, "quux", "q", "quux flag")
       };
       int optc = sizeof(opts) / sizeof(opts[0]);
       magot_err_t err;
