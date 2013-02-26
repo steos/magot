@@ -102,6 +102,22 @@ bool process_opt(args_t *args, magot_t *opt, magot_err_t *err) {
   return true;
 }
 
+bool process_cluster(char *arg, int len,
+		     int optc, magot_t **optv,
+		     magot_err_t *err) {
+  for (int i = 1; i < len; ++i) {
+    char name[] = { arg[i], '\0' };
+    magot_t *opt = find_opt(optc, optv, name);
+    if (opt == NULL) {
+      err->type = MAGOT_ERR_UNKNOWN_OPT;
+      err->arg = arg;
+      return false;
+    }
+    opt->value = "";
+  }
+  return true;
+}
+
 bool magot_parse(int argc, char **argv,
 		 int optc, magot_t **optv,
 		 magot_parseconf_t *conf,
@@ -114,35 +130,28 @@ bool magot_parse(int argc, char **argv,
   for (; !args_done(&args); args_next(&args)) {
     char *arg = args_get(&args);
     int len = strlen(arg);
-    if (len > 1 && arg[0] == '-') {
-      if (len > 2 && arg[1] != '-' && posix) {
-	for (int i = 1; i < len; ++i) {
-	  char name[] = { arg[i], '\0' };
-	  magot_t *opt = find_opt(optc, optv, name);
-	  if (opt == NULL) {
-	    err->type = MAGOT_ERR_UNKNOWN_OPT;
-	    err->arg = arg;
-	    return false;
-	  }
-	  opt->value = "";
-	}
-      } else {
-	char *name = arg[1] == '-' ?
-	  arg + 2 : arg + 1;
-	magot_t *opt = find_opt(optc, optv, name);
-	if (opt == NULL) {
-	  err->type = MAGOT_ERR_UNKNOWN_OPT;
-	  err->arg = arg;
-	  return false;
-	}
-	if (!process_opt(&args, opt, err)) {
-	  return false;
-	}
-      }
-    } else {
+    bool valid_opt = len > 1 && arg[0] == '-';
+    if (!valid_opt) {
       err->type = MAGOT_ERR_UNKNOWN_OPT;
       err->arg = arg;
       return false;
+    }
+    if (posix && len > 2 && arg[1] != '-') {
+      if (!process_cluster(arg, len, optc, optv, err)) {
+	return false;
+      }
+    } else {
+      char *name = arg[1] == '-' ?
+	arg + 2 : arg + 1;
+      magot_t *opt = find_opt(optc, optv, name);
+      if (opt == NULL) {
+	err->type = MAGOT_ERR_UNKNOWN_OPT;
+	err->arg = arg;
+	return false;
+      }
+      if (!process_opt(&args, opt, err)) {
+	return false;
+      }
     }
   }
   for (int i = 0; i < optc; ++i) {
@@ -161,7 +170,7 @@ bool magot_isset(magot_t *opt) {
 }
 
 bool str_empty(char *str) {
-  return str == NULL || strlen(str) == 0;
+  return str == NULL || *str == '\0';
 }
 
 void magot_print_help(FILE *f, int optc, magot_t **optv,

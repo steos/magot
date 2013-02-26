@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
     magot_init_opt(&bar, "bar", "b", false,
 		   "the bar option. 'tis optional."),
     magot_init_flag(&baz, "baz", "z", "a useless flag"),
-    magot_init_flag(&quux, "quux", "q", "the quux flag"),
+    magot_init_flag(&quux, "", "q", "the quux flag"),
     magot_init_flag(&lorem, "lorem-ipsum", NULL, "lorem ipsum flag")
   };
   int optc = sizeof(opts) / sizeof(opts[0]);
