@@ -17,7 +17,8 @@
 void print_usage(int optc, magot_t **optv, magot_style_t style) {
   puts("Usage: demo [OPTIONS]");
   puts("SYNOPSIS");
-  puts("  demo -foo foobar -z");
+  puts("  demo --foo foobar -z");
+  puts("  demo -f foobar -qz --lorem-ipsum");
   puts("OPTIONS");
   magot_print_help(stdout, optc, optv, style);
 }
