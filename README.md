@@ -82,7 +82,12 @@ Getopt makes me want to gouge my eyes out.
 
 ## Build?
 
-To build and install execute
+Just execute make to build everything (performs no optimizations, see
+CFLAGS below)
+
+    make
+
+To install execute
 
     make install
 
@@ -102,10 +107,23 @@ To remove all generated files execute
 
     make clean
 
-Note that by default the CFLAGS don't specify any optimizations. If you want an optimized build just set the appropriate CFLAGS.
+### CFLAGS
 
-    make CFLAGS=-O3
+Note that by default the CFLAGS don't specify any optimizations. If
+you want an optimized build just set the appropriate CFLAGS
 
+    make CFLAGS=-O2
+
+Magot makes liberal use of assertions. If you're confident that it
+doesn't break just compile with NDEBUG if you are sure that you want
+to disable them (not recommended)
+
+    make CFLAGS='-O2 -DNDEBUG'
+
+Conversely, if you're debugging with gdb set the -g flag to improve
+your debugging experience
+
+    make CFLAGS=-g
 
 ## Use?
 
