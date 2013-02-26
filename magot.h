@@ -31,7 +31,12 @@ typedef enum {
 
 typedef struct {
   magot_style_t style;
-} magot_parseconf_t;
+  int argc;
+  char **argv;
+  int offset;
+  int rem_count;
+  char **remaining;
+} magot_parser_t;
 
 typedef struct {
   char *name;
@@ -47,6 +52,10 @@ typedef struct {
   magot_errtype_t type;
   char *arg;
 } magot_err_t;
+
+void magot_parser(magot_parser_t *parser,
+		  int argc,
+		  char **argv);
 
 magot_t *magot_init(magot_t *opt,
 		    char *name,
@@ -66,9 +75,8 @@ magot_t *magot_flag(magot_t *opt,
 		    char *short_name,
 		    char *help);
 
-bool magot_parse(int argc, char **argv,
-		 int optc, magot_t **optv,
-		 magot_parseconf_t *conf,
+bool magot_parse(int optc, magot_t **optv,
+		 magot_parser_t *parser,
 		 magot_err_t *err);
 
 bool magot_isset(magot_t *opt);

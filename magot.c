@@ -20,6 +20,15 @@ bool str_empty(char *str) {
   return str == NULL || *str == '\0';
 }
 
+void magot_parser(magot_parser_t *parser, int argc, char **argv) {
+  parser->argc = argc;
+  parser->argv = argv;
+  parser->offset = 1;
+  parser->rem_count = 0;
+  parser->remaining = NULL;
+  parser->style = MAGOT_STYLE_POSIX;
+}
+
 magot_t *magot_init(magot_t *opt,
 		    char *name,
 		    char *short_name,
@@ -57,27 +66,21 @@ magot_t *magot_opt(magot_t *opt,
 		    false, required, help);
 }
 
-typedef struct {
-  int argc;
-  char **argv;
-  int offset;
-} args_t;
-
-bool args_last(args_t *a) {
+bool args_last(magot_parser_t *a) {
   return a->argc == a->offset + 1;
 }
-char *args_get(args_t *a) {
+char *args_get(magot_parser_t *a) {
   assert(a->offset < a->argc);
   return a->argv[a->offset];
 }
-void args_next(args_t *a) {
+void args_next(magot_parser_t *a) {
   a->offset++;
 }
-bool args_done(args_t *a) {
+bool args_done(magot_parser_t *a) {
   return a->offset >= a->argc;
 }
 
-char *args_get_next(args_t *a) {
+char *args_get_next(magot_parser_t *a) {
   args_next(a);
   return args_get(a);
 }
@@ -103,7 +106,9 @@ bool error(magot_err_t *err,
   return false;
 }
 
-bool process_opt(args_t *args, magot_t *opt, magot_err_t *err) {
+bool process_opt(magot_parser_t *args,
+		 magot_t *opt,
+		 magot_err_t *err) {
   if (opt->flag) {
     opt->value = "";
   } else if (args_last(args)) {
@@ -129,23 +134,23 @@ bool process_cluster(char *arg, int len,
   return true;
 }
 
-bool magot_parse(int argc, char **argv,
-		 int optc, magot_t **optv,
-		 magot_parseconf_t *conf,
+bool magot_parse(int optc, magot_t **optv,
+		 magot_parser_t *parser,
 		 magot_err_t *err) {
-  args_t args;
-  args.argc = argc;
-  args.argv = argv;
-  args.offset = 1;
-  bool posix = conf->style == MAGOT_STYLE_POSIX;
-  for (; !args_done(&args); args_next(&args)) {
-    char *arg = args_get(&args);
+  bool posix = parser->style == MAGOT_STYLE_POSIX;
+  for (; !args_done(parser); args_next(parser)) {
+    char *arg = args_get(parser);
     int len = strlen(arg);
     bool valid_opt = len > 1 && arg[0] == '-';
     if (!valid_opt) {
-      return error(err, MAGOT_ERR_UNKNOWN_OPT, arg);
-    }
-    if (posix && len > 2 && arg[1] != '-') {
+      if (parser->remaining != NULL) {
+	assert(parser->rem_count < parser->argc - 1 &&
+	       "can't have more remaining than total");
+	parser->remaining[parser->rem_count++] = arg;
+      } else {
+	return error(err, MAGOT_ERR_UNKNOWN_OPT, arg);
+      }
+    } else if (posix && len > 2 && arg[1] != '-') {
       if (!process_cluster(arg, len, optc, optv, err)) {
 	return false;
       }
@@ -159,7 +164,7 @@ bool magot_parse(int argc, char **argv,
       if (opt == NULL) {
 	return error(err, MAGOT_ERR_UNKNOWN_OPT, arg);
       }
-      if (!process_opt(&args, opt, err)) {
+      if (!process_opt(parser, opt, err)) {
 	return false;
       }
     }

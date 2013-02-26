@@ -36,18 +36,17 @@ int main(int argc, char **argv) {
   };
   int optc = sizeof(opts) / sizeof(opts[0]);
   foo.arg_name = "file";
-  magot_style_t style = MAGOT_STYLE_POSIX;
-
+  magot_parser_t parser;
+  magot_parser(&parser, argc, argv);
+  char *remaining[argc - 1];
+  parser.remaining = remaining;
   if (argc == 1) {
-    print_usage(optc, opts, style);
+    print_usage(optc, opts, parser.style);
     return 0;
   }
-
   magot_err_t err;
   memset(&err, 0, sizeof(magot_err_t));
-  magot_parseconf_t conf;
-  conf.style = style;
-  bool success = magot_parse(argc, argv, optc, opts, &conf, &err);
+  bool success = magot_parse(optc, opts, &parser, &err);
   if (!success) {
     printf("%s: %s\n", magot_errstr(&err), err.arg);
     return 1;
@@ -65,6 +64,10 @@ int main(int argc, char **argv) {
   }
   if (magot_isset(&lorem)) {
     puts("lorem ipsum present");
+  }
+  puts("remaining args:");
+  for (int i = 0; i < parser.rem_count; ++i) {
+    puts(parser.remaining[i]);
   }
   return 0;
 }
