@@ -19,12 +19,8 @@ Suggestions, contributions and flames welcome.
 * flag clusters when using POSIX style
 * mandatory arguments
 * print usage summary
-
-#### Wishlist
-
-* multi-valued arguments
-* custom argument separators
 * collect remaining arguments
+* no heap allocations
 
 ### Catch?
 
@@ -32,8 +28,9 @@ The API is not finalized therefore the soname will _not_ change on BC
 breaks until it is (if ever - just link to it statically if you are
 crazy enough to actually use it).
 
-This is first and foremost my private toy. No warranty. No
-support. Use at own risk. Yada yada.
+This is first and foremost my personal toy. The code is in all
+likelyhood horribly inefficient. No warranty. No support. Use at own
+risk. Yada yada.
 
 ## Why?
 
