@@ -9,7 +9,7 @@
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE.
 
-override CFLAGS += -Wall -Wextra -pedantic -std=c99 -I. -fPIC
+override CFLAGS += -Wall -Wextra -pedantic -std=c99 -I.
 
 PREFIX = /usr/local
 
@@ -34,9 +34,10 @@ uninstall:
 	rm -f $(PREFIX)/include/magot.h \
 	$(PREFIX)/lib/libmagot.*
 
-
 demo: demo.o magot.o
 demo.o: magot.o
+magot.o: magot.c magot.h
+	$(COMPILE.c) -fPIC $(OUTPUT_OPTION) $<
 
 .PHONY: doc
 doc: README.html
@@ -47,7 +48,7 @@ doc: README.html
 	pandoc -f markdown -t html -s $< > $@
 
 lib%.so: %.o
-	$(LINK.c) -shared -Wl,-soname,$@ -fPIC -o $@ $<
+	$(LINK.c) -shared -Wl,-soname,$@ -o $@ $<
 
 lib%.a: %.o
 	$(AR) $(ARFLAGS) $@ $^
