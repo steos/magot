@@ -43,7 +43,7 @@ Getopt makes me want to gouge my eyes out.
 
     #include <magot.h>
     int main(int argc, char **argv) {
-      magot_t foo, bar, baz;
+      magot_t foo, bar, baz, quux;
       magot_t *opts[] = {
         magot_init_opt(&foo, "foo", "f", true, "foo option"),
         magot_init_opt(&bar, "bar", "b", false, "bar option"),
@@ -57,7 +57,7 @@ Getopt makes me want to gouge my eyes out.
 
       if (argc == 1) {
         puts("OPTIONS");
-        magot_print_help(stdout, optc, optv, conf.style);
+        magot_print_help(stdout, optc, opts, conf.style);
         return 0;
       }
 
