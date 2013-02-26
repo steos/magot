@@ -13,12 +13,20 @@ compiler without any warnings. The Makefile targets GNU Make >= 3.80.
 
 Suggestions, contributions and flames welcome.
 
-### Catch?
+### Features
 
-The current functionality is pretty minimal. There is no support for
-collecting remaining arguments, no concept of short or long options,
-no support for aliases, flag clusters, custom argument separators,
-multi-valued arguments, etc.
+* POSIX or GNU style options
+* flag clusters when using POSIX style
+* mandatory arguments
+* print usage summary
+
+#### Wishlist
+
+* multi-valued arguments
+* custom argument separators
+* collect remaining arguments
+
+### Catch?
 
 The API is not finalized therefore the soname will _not_ change on BC
 breaks until it is (if ever - just link to it statically if you are
@@ -37,13 +45,23 @@ Getopt makes me want to gouge my eyes out.
     int main(int argc, char **argv) {
       magot_t foo, bar, baz;
       magot_t *opts[] = {
-        magot_init_opt(&foo, "-f", true, "foo option"),
-        magot_init_opt(&bar, "-b", false, "bar option"),
-        magot_init_flag(&baz, "-z", "baz flag")
+        magot_init_opt(&foo, "foo", "f", true, "foo option"),
+        magot_init_opt(&bar, "bar", "b", false, "bar option"),
+        magot_init_flag(&baz, "baz", "z", "baz flag"),
+        magot_init_flag(&quux, "quux", "q", "quux flag")
       };
       int optc = sizeof(opts) / sizeof(opts[0]);
       magot_err_t err;
-      bool success = magot_parse(&err, argc, argv, optc, opts);
+      magot_parseconf_t conf;
+      conf.style = MAGOT_STYLE_POSIX;
+
+      if (argc == 1) {
+        puts("OPTIONS");
+        magot_print_help(stdout, optc, optv, conf.style);
+        return 0;
+      }
+
+      bool success = magot_parse(argc, argv, optc, opts, &conf, &err);
       if (!success) {
         printf("%s: %s\n", magot_errstr(&err), err.arg);
         return 1;
@@ -56,9 +74,11 @@ Getopt makes me want to gouge my eyes out.
       if (magot_isset(&baz)) {
         puts("baz flag present");
       }
+      if (magot_isset(&quux)) {
+        puts("quux flag present");
+      }
       return 0;
     }
-
 
 ## Build?
 
