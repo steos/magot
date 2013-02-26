@@ -207,7 +207,9 @@ void magot_print_help(FILE *f, int optc, magot_t **optv,
     } else {
       fputs("\n", f);
     }
-    fprintf(f, "    %s\n", opt->help);
+    if (!str_empty(opt->help)) {
+      fprintf(f, "    %s\n", opt->help);
+    }
   }
 }
 
