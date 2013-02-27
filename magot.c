@@ -158,8 +158,6 @@ bool magot_parse(int optc, magot_t **optv,
     bool valid_opt = len > 1 && arg[0] == '-';
     if (!valid_opt) {
       if (parser->remaining != NULL) {
-	assert(parser->rem_count < parser->argc - 1 &&
-	       "can't have more remaining than total");
 	parser->remaining[parser->rem_count++] = arg;
       } else {
 	return error(err, MAGOT_ERR_UNKNOWN_OPT, arg);
