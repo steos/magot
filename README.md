@@ -38,6 +38,8 @@ Getopt makes me want to gouge my eyes out.
 
 ## How?
 
+Look at demo.c for a better example.
+
     #include <magot.h>
     int main(int argc, char **argv) {
       magot_t foo, bar, baz, quux;
@@ -47,20 +49,17 @@ Getopt makes me want to gouge my eyes out.
         magot_flag(&baz, "baz", "z", "baz flag"),
         magot_flag(&quux, "quux", "q", "quux flag")
       };
+
       int optc = sizeof(opts) / sizeof(opts[0]);
       magot_err_t err;
-      magot_parseconf_t conf;
-      conf.style = MAGOT_STYLE_POSIX;
+      magot_parser_t parser;
+      magot_parser(&parser, argc, argv);
+      parser.style = MAGOT_STYLE_GNU;
 
-      if (argc == 1) {
-        puts("OPTIONS");
-        magot_print_help(stdout, optc, opts, conf.style);
-        return 0;
-      }
-
-      bool success = magot_parse(argc, argv, optc, opts, &conf, &err);
-      if (!success) {
+      if (!magot_parse(optc, opts, &parser, &err)) {
         printf("%s: %s\n", magot_errstr(&err), err.arg);
+        puts("OPTIONS");
+        magot_print_help(stdout, optc, opts, parser.style);
         return 1;
       }
 
