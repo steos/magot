@@ -38,7 +38,7 @@ Getopt makes me want to gouge my eyes out.
 
 ## How?
 
-Look at demo.c for a better example.
+Look at demo.c for an example with explanations.
 
     #include <magot.h>
     int main(int argc, char **argv) {
