@@ -51,20 +51,11 @@ int main(int argc, char **argv) {
     // null or empty string is all the same to magot
     magot_flag(&lorem, "lorem-ipsum", NULL, ""),
 
-    // you don't have to give long and short names
-    // but at least one of them must not be empty
+    // You don't have to give both a long and a short name
+    // but at least one of them must not be empty.
+    // If the short name is not empty it has to be exactly
+    // one character long!
     magot_flag(&quux, "", "q", "the quux flag"),
-
-    // When using GNU style there is no difference
-    // between long and short names and you could use
-    // a longer string for the short name than for the long name
-    // with no problems.
-    // If you use POSIX style however, you should stick to
-    // multiple characters for the long name otherwise
-    // magot accepts the long name with a short prefix.
-    // You can use more than one character for the short name
-    // but such an opt won't be able to participate in
-    // flag clusters and it's probably confusing.
   };
   // magot needs to know the number of opts
   int optc = sizeof(opts) / sizeof(opts[0]);
