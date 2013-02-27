@@ -40,41 +40,42 @@ Getopt makes me want to gouge my eyes out.
 
 Look at demo.c for an example with explanations.
 
-    #include <magot.h>
-    int main(int argc, char **argv) {
-      magot_t foo, bar, baz, quux;
-      magot_t *opts[] = {
-        magot_opt(&foo, "foo", "f", true, "foo option"),
-        magot_opt(&bar, "bar", "b", false, "bar option"),
-        magot_flag(&baz, "baz", "z", "baz flag"),
-        magot_flag(&quux, "quux", "q", "quux flag")
-      };
+```c
+#include <magot.h>
+int main(int argc, char **argv) {
+  magot_t foo, bar, baz, quux;
+  magot_t *opts[] = {
+    magot_opt(&foo, "foo", "f", true, "foo option"),
+    magot_opt(&bar, "bar", "b", false, "bar option"),
+    magot_flag(&baz, "baz", "z", "baz flag"),
+    magot_flag(&quux, "quux", "q", "quux flag")
+  };
 
-      int optc = sizeof(opts) / sizeof(opts[0]);
-      magot_err_t err;
-      magot_parser_t parser;
-      magot_parser(&parser, argc, argv);
-      parser.style = MAGOT_STYLE_GNU;
+  int optc = sizeof(opts) / sizeof(opts[0]);
+  magot_parser_t parser;
+  magot_parser(&parser, argc, argv);
+  parser.style = MAGOT_STYLE_GNU;
 
-      if (!magot_parse(optc, opts, &parser, &err)) {
-        printf("%s: %s\n", magot_errstr(&err), err.arg);
-        puts("OPTIONS");
-        magot_print_help(stdout, optc, opts, parser.style);
-        return 1;
-      }
+  if (!magot_parse(optc, opts, &parser)) {
+    magot_print_error(stdout, &parser);
+    puts("OPTIONS");
+    magot_print_help(stdout, optc, opts, parser.style);
+    return 1;
+  }
 
-      printf("foo option: %s\n", foo.value);
-      if (magot_isset(&bar)) {
-        printf("bar option: %s\n", bar.value);
-      }
-      if (magot_isset(&baz)) {
-        puts("baz flag present");
-      }
-      if (magot_isset(&quux)) {
-        puts("quux flag present");
-      }
-      return 0;
-    }
+  printf("foo option: %s\n", foo.value);
+  if (magot_isset(&bar)) {
+    printf("bar option: %s\n", bar.value);
+  }
+  if (magot_isset(&baz)) {
+    puts("baz flag present");
+  }
+  if (magot_isset(&quux)) {
+    puts("quux flag present");
+  }
+  return 0;
+}
+```
 
 ## Build?
 
