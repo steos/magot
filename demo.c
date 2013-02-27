@@ -88,11 +88,9 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  magot_err_t err;
-  memset(&err, 0, sizeof(magot_err_t));
-  bool success = magot_parse(optc, opts, &parser, &err);
+  bool success = magot_parse(optc, opts, &parser);
   if (!success) {
-    printf("%s: %s\n", magot_errstr(&err), err.arg);
+    printf("%s: %s\n", magot_errstr(&parser), parser.err_arg);
     return 1;
   }
 

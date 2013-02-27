@@ -27,6 +27,7 @@ void magot_parser(magot_parser_t *parser, int argc, char **argv) {
   parser->rem_count = 0;
   parser->remaining = NULL;
   parser->style = MAGOT_STYLE_POSIX;
+  parser->err_arg = NULL;
 }
 
 magot_t *magot_init(magot_t *opt,
@@ -112,22 +113,18 @@ magot_t *find_opt(int optc, magot_t **opts, char *name,
   return NULL;
 }
 
-bool error(magot_err_t *err,
-	       magot_errtype_t type,
-	       char *arg) {
-  err->type = type;
-  err->arg = arg;
+bool error(magot_parser_t *parser, magot_errtype_t type, char *arg) {
+  parser->err_type = type;
+  parser->err_arg = arg;
   return false;
 }
 
-bool process_opt(magot_parser_t *args,
-		 magot_t *opt,
-		 magot_err_t *err) {
+bool process_opt(magot_parser_t *args, magot_t *opt) {
   if (opt->flag) {
     opt->value = "";
   } else if (args_last(args)) {
-    return error(err, MAGOT_ERR_MISSING_ARG,
-		     args_get(args));
+    return error(args, MAGOT_ERR_MISSING_ARG,
+		 args_get(args));
   } else {
     opt->value = args_get_next(args);
   }
@@ -136,50 +133,48 @@ bool process_opt(magot_parser_t *args,
 
 bool process_cluster(char *arg, int len,
 		     int optc, magot_t **optv,
-		     magot_err_t *err) {
+		     magot_parser_t *parser) {
   for (int i = 1; i < len; ++i) {
     char name[] = { arg[i], '\0' };
     magot_t *opt = find_opt(optc, optv, name, &match_short_name);
     if (opt == NULL) {
-      return error(err, MAGOT_ERR_UNKNOWN_OPT, arg);
+      return error(parser, MAGOT_ERR_UNKNOWN_OPT, arg);
     }
     opt->value = "";
   }
   return true;
 }
 
-bool magot_parse(int optc, magot_t **optv,
-		 magot_parser_t *parser,
-		 magot_err_t *err) {
+bool magot_parse(int optc, magot_t **optv, magot_parser_t *parser) {
   bool posix = parser->style == MAGOT_STYLE_POSIX;
   for (; !args_done(parser); args_next(parser)) {
     char *arg = args_get(parser);
     int len = strlen(arg);
     bool valid_opt = len > 1 && arg[0] == '-';
     bool long_opt = valid_opt &&
-      ((posix && arg[1] == '-') || !posix && len > 2);
+      ((posix && arg[1] == '-') || (!posix && len > 2));
     if (!valid_opt) {
       if (parser->remaining != NULL) {
 	parser->remaining[parser->rem_count++] = arg;
       } else {
-	return error(err, MAGOT_ERR_UNKNOWN_OPT, arg);
+	return error(parser, MAGOT_ERR_UNKNOWN_OPT, arg);
       }
     } else if (posix && !long_opt && len > 2) {
-      if (!process_cluster(arg, len, optc, optv, err)) {
+      if (!process_cluster(arg, len, optc, optv, parser)) {
 	return false;
       }
     } else {
       char *name = posix && long_opt ? arg + 2 : arg + 1;
       if (str_empty(name)) {
-	return error(err, MAGOT_ERR_UNKNOWN_OPT, arg);
+	return error(parser, MAGOT_ERR_UNKNOWN_OPT, arg);
       }
       bool (*matcher)(magot_t*,char*) = long_opt ?
 	&match_long_name : &match_short_name;
       magot_t *opt = find_opt(optc, optv, name, matcher);
       if (opt == NULL) {
-	return error(err, MAGOT_ERR_UNKNOWN_OPT, arg);
+	return error(parser, MAGOT_ERR_UNKNOWN_OPT, arg);
       }
-      if (!process_opt(parser, opt, err)) {
+      if (!process_opt(parser, opt)) {
 	return false;
       }
     }
@@ -187,8 +182,7 @@ bool magot_parse(int optc, magot_t **optv,
   for (int i = 0; i < optc; ++i) {
     magot_t *opt = optv[i];
     if (opt->required && !magot_isset(opt)) {
-      return error(err, MAGOT_ERR_MISSING_REQUIRED,
-		       opt->name);
+      return error(parser, MAGOT_ERR_MISSING_REQUIRED, opt->name);
     }
   }
   return true;
@@ -228,8 +222,8 @@ void magot_print_help(FILE *f, int optc, magot_t **optv,
   }
 }
 
-char *magot_errstr(magot_err_t *err) {
-  switch (err->type) {
+char *magot_errstr(magot_parser_t *parser) {
+  switch (parser->err_type) {
   case MAGOT_ERR_UNKNOWN_OPT: return "unknown option";
   case MAGOT_ERR_MISSING_REQUIRED: return "missing required option";
   case MAGOT_ERR_MISSING_ARG: return "missing argument";

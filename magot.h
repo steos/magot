@@ -35,6 +35,8 @@ typedef struct {
   int offset;
   int rem_count;
   char **remaining;
+  magot_errtype_t err_type;
+  char *err_arg;
 } magot_parser_t;
 
 typedef struct {
@@ -46,11 +48,6 @@ typedef struct {
   char *arg_name;
   char *value;
 } magot_t;
-
-typedef struct {
-  magot_errtype_t type;
-  char *arg;
-} magot_err_t;
 
 void magot_parser(magot_parser_t *parser,
 		  int argc,
@@ -75,8 +72,7 @@ magot_t *magot_flag(magot_t *opt,
 		    char *help);
 
 bool magot_parse(int optc, magot_t **optv,
-		 magot_parser_t *parser,
-		 magot_err_t *err);
+		 magot_parser_t *parser);
 
 bool magot_isset(magot_t *opt);
 
@@ -85,6 +81,6 @@ void magot_print_help(FILE *f,
 		      magot_t **optv,
 		      magot_style_t style);
 
-char *magot_errstr(magot_err_t *err);
+char *magot_errstr(magot_parser_t *parser);
 
 #endif /* MAGOT_H */
