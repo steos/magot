@@ -14,6 +14,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define EMPTY(str) (str == NULL || *str == '\0')
+
 void print_usage(int optc, magot_t **optv, magot_style_t style) {
   puts("Usage: demo [OPTIONS]");
   puts("SYNOPSIS");
@@ -21,6 +23,14 @@ void print_usage(int optc, magot_t **optv, magot_style_t style) {
   puts("  demo -f foobar -qz --lorem-ipsum");
   puts("OPTIONS");
   magot_print_help(stdout, optc, optv, style);
+}
+
+char *opt_value_str(magot_t *opt) {
+  if (opt->flag) {
+    return magot_isset(opt) ? "true" : "false";
+  } else {
+    return magot_isset(opt) ? opt->value : "N/A";
+  }
 }
 
 int main(int argc, char **argv) {
@@ -31,8 +41,8 @@ int main(int argc, char **argv) {
     magot_opt(&bar, "bar", "b", false,
 	      "the bar option. 'tis optional."),
     magot_flag(&baz, "baz", "z", "a useless flag"),
+    magot_flag(&lorem, "lorem-ipsum", NULL, ""),
     magot_flag(&quux, "", "q", "the quux flag"),
-    magot_flag(&lorem, "lorem-ipsum", NULL, "lorem ipsum flag")
   };
   int optc = sizeof(opts) / sizeof(opts[0]);
   foo.arg_name = "file";
@@ -52,22 +62,21 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  printf("foo option: %s\n", foo.value);
-  if (magot_isset(&bar)) {
-    printf("bar option: %s\n", bar.value);
+  for (int i = 0; i < optc; ++i) {
+    magot_t *opt = opts[i];
+    printf("%s: <%s>\n",
+	   EMPTY(opt->name) ? opt->short_name : opt->name,
+	   opt_value_str(opt));
   }
-  if (magot_isset(&baz)) {
-    puts("baz flag present");
-  }
-  if (magot_isset(&quux)) {
-    puts("quux present");
-  }
-  if (magot_isset(&lorem)) {
-    puts("lorem ipsum present");
-  }
-  puts("remaining args:");
-  for (int i = 0; i < parser.rem_count; ++i) {
-    puts(parser.remaining[i]);
+  if (parser.rem_count > 0) {
+    fputs("remaining args: ", stdout);
+    for (int i = 0; i < parser.rem_count; ++i) {
+      fprintf(stdout, "'%s'", parser.remaining[i]);
+      if (i + 1 < parser.rem_count) {
+	fputs(", ", stdout);
+      }
+    }
+    puts("");
   }
   return 0;
 }
