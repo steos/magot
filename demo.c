@@ -17,8 +17,9 @@
 #define EMPTY(str) (str == NULL || *str == '\0')
 
 void print_usage(int optc, magot_t **optv, magot_style_t style) {
-  puts("Usage: demo [OPTIONS]");
   puts("SYNOPSIS");
+  puts("  demo [OPTIONS]");
+  puts("EXAMPLES");
   puts("  demo --foo foobar -z");
   puts("  demo -f foobar -qz --lorem-ipsum");
   puts("OPTIONS");
@@ -90,7 +91,9 @@ int main(int argc, char **argv) {
 
   bool success = magot_parse(optc, opts, &parser);
   if (!success) {
-    printf("%s: %s\n", magot_errstr(&parser), parser.err_arg);
+    fputs("Error: ", stdout);
+    magot_print_error(stdout, &parser);
+    print_usage(optc, opts, parser.style);
     return 1;
   }
 

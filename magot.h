@@ -81,6 +81,6 @@ void magot_print_help(FILE *f,
 		      magot_t **optv,
 		      magot_style_t style);
 
-char *magot_errstr(magot_parser_t *parser);
+void magot_print_error(FILE *f, magot_parser_t *parser);
 
 #endif /* MAGOT_H */

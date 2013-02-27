@@ -182,7 +182,8 @@ bool magot_parse(int optc, magot_t **optv, magot_parser_t *parser) {
   for (int i = 0; i < optc; ++i) {
     magot_t *opt = optv[i];
     if (opt->required && !magot_isset(opt)) {
-      return error(parser, MAGOT_ERR_MISSING_REQUIRED, opt->name);
+      return error(parser, MAGOT_ERR_MISSING_REQUIRED,
+		   !str_empty(opt->name) ? opt->name : opt->short_name);
     }
   }
   return true;
@@ -222,11 +223,23 @@ void magot_print_help(FILE *f, int optc, magot_t **optv,
   }
 }
 
-char *magot_errstr(magot_parser_t *parser) {
+void magot_print_error(FILE *f, magot_parser_t *parser) {
+  assert(parser != NULL);
+  assert(parser->err_arg != NULL);
+  const bool posix = parser->style == MAGOT_STYLE_POSIX;
   switch (parser->err_type) {
-  case MAGOT_ERR_UNKNOWN_OPT: return "unknown option";
-  case MAGOT_ERR_MISSING_REQUIRED: return "missing required option";
-  case MAGOT_ERR_MISSING_ARG: return "missing argument";
+    case MAGOT_ERR_UNKNOWN_OPT:
+      fprintf(f, "option '%s' is unknown\n", parser->err_arg);
+      break;
+    case MAGOT_ERR_MISSING_REQUIRED:
+      fprintf(f, "missing required option '%s%s'\n",
+	      posix && strlen(parser->err_arg) > 1 ? "--" : "-",
+	      parser->err_arg);
+      break;
+    case MAGOT_ERR_MISSING_ARG:
+      fprintf(f, "missing argument for option '%s'\n", parser->err_arg);
+      break;
+    default:
+      assert(false && "err type not handled");
   }
-  return NULL;
 }
