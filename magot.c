@@ -156,25 +156,26 @@ bool magot_parse(int optc, magot_t **optv,
     char *arg = args_get(parser);
     int len = strlen(arg);
     bool valid_opt = len > 1 && arg[0] == '-';
+    bool long_opt = valid_opt &&
+      ((posix && arg[1] == '-') || !posix && len > 2);
     if (!valid_opt) {
       if (parser->remaining != NULL) {
 	parser->remaining[parser->rem_count++] = arg;
       } else {
 	return error(err, MAGOT_ERR_UNKNOWN_OPT, arg);
       }
-    } else if (posix && len > 2 && arg[1] != '-') {
+    } else if (posix && !long_opt) {
       if (!process_cluster(arg, len, optc, optv, err)) {
 	return false;
       }
     } else {
-      bool posix_long = posix && arg[1] == '-';
-      char *name = posix_long ? arg + 2 : arg + 1;
+      char *name = posix && long_opt ? arg + 2 : arg + 1;
       if (str_empty(name)) {
 	return error(err, MAGOT_ERR_UNKNOWN_OPT, arg);
       }
-      magot_t *opt = find_opt(optc, optv, name,
-			      posix_long ?
-			      &match_long_name : &match_any_name);
+      bool (*matcher)(magot_t*,char*) = long_opt ?
+	&match_long_name : &match_short_name;
+      magot_t *opt = find_opt(optc, optv, name, matcher);
       if (opt == NULL) {
 	return error(err, MAGOT_ERR_UNKNOWN_OPT, arg);
       }
