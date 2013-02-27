@@ -164,7 +164,7 @@ bool magot_parse(int optc, magot_t **optv,
       } else {
 	return error(err, MAGOT_ERR_UNKNOWN_OPT, arg);
       }
-    } else if (posix && !long_opt) {
+    } else if (posix && !long_opt && len > 2) {
       if (!process_cluster(arg, len, optc, optv, err)) {
 	return false;
       }
