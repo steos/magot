@@ -155,8 +155,7 @@ bool magot_parse(int optc, magot_t **optv,
 	return false;
       }
     } else {
-      char *name = arg[1] == '-' ?
-	arg + 2 : arg + 1;
+      char *name = posix && arg[1] == '-' ? arg + 2 : arg + 1;
       if (str_empty(name)) {
 	return error(err, MAGOT_ERR_UNKNOWN_OPT, arg);
       }
