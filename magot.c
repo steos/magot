@@ -39,6 +39,8 @@ magot_t *magot_init(magot_t *opt,
 	 && "a flag cannot be required");
   assert((!str_empty(name) || !str_empty(short_name))
 	 && "option must have non-empty name");
+  assert((str_empty(short_name) || strlen(short_name) == 1)
+	 && "short name must be a single character or empty");
   opt->name = name;
   opt->short_name = short_name;
   opt->flag = flag;
@@ -85,13 +87,25 @@ char *args_get_next(magot_parser_t *a) {
   return args_get(a);
 }
 
-magot_t *find_opt(int optc, magot_t **opts, char *name) {
+bool match_short_name(magot_t *opt, char *str) {
+  return !str_empty(opt->short_name)
+    && strcmp(opt->short_name, str) == 0;
+}
+bool match_long_name(magot_t *opt, char *str) {
+  return !str_empty(opt->name)
+    && strcmp(opt->name, str) == 0;
+}
+
+bool match_any_name(magot_t *opt, char *str) {
+  return match_long_name(opt, str)
+    || match_short_name(opt, str);
+}
+
+magot_t *find_opt(int optc, magot_t **opts, char *name,
+		  bool (*match)(magot_t*,char*)) {
   for (int i = 0; i < optc; ++i) {
     magot_t *opt = opts[i];
-    if ((opt->name != NULL
-	 && strcmp(opt->name, name) == 0) ||
-	(opt->short_name != NULL
-	 && strcmp(opt->short_name, name) == 0)) {
+    if (match(opt, name)) {
       return opt;
     }
   }
@@ -125,7 +139,7 @@ bool process_cluster(char *arg, int len,
 		     magot_err_t *err) {
   for (int i = 1; i < len; ++i) {
     char name[] = { arg[i], '\0' };
-    magot_t *opt = find_opt(optc, optv, name);
+    magot_t *opt = find_opt(optc, optv, name, &match_short_name);
     if (opt == NULL) {
       return error(err, MAGOT_ERR_UNKNOWN_OPT, arg);
     }
@@ -155,11 +169,14 @@ bool magot_parse(int optc, magot_t **optv,
 	return false;
       }
     } else {
-      char *name = posix && arg[1] == '-' ? arg + 2 : arg + 1;
+      bool posix_long = posix && arg[1] == '-';
+      char *name = posix_long ? arg + 2 : arg + 1;
       if (str_empty(name)) {
 	return error(err, MAGOT_ERR_UNKNOWN_OPT, arg);
       }
-      magot_t *opt = find_opt(optc, optv, name);
+      magot_t *opt = find_opt(optc, optv, name,
+			      posix_long ?
+			      &match_long_name : &match_any_name);
       if (opt == NULL) {
 	return error(err, MAGOT_ERR_UNKNOWN_OPT, arg);
       }
