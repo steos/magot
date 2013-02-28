@@ -54,18 +54,18 @@ int main(int argc, char **argv) {
   int optc = sizeof(opts) / sizeof(opts[0]);
   magot_parser_t parser;
   magot_parser(&parser, argc, argv);
-  parser.style = MAGOT_STYLE_GNU;
+  magot_set_style(&parser, MAGOT_STYLE_GNU);
 
   if (!magot_parse(optc, opts, &parser)) {
     magot_print_error(stdout, &parser);
     puts("OPTIONS");
-    magot_print_help(stdout, optc, opts, parser.style);
+    magot_print_help(stdout, optc, opts, magot_get_style(&parser));
     return 1;
   }
 
-  printf("foo option: %s\n", foo.value);
+  printf("foo option: %s\n", magot_value(&foo));
   if (magot_isset(&bar)) {
-    printf("bar option: %s\n", bar.value);
+    printf("bar option: %s\n", magot_value(&bar));
   }
   if (magot_isset(&baz)) {
     puts("baz flag present");

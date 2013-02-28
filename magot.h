@@ -83,4 +83,34 @@ void magot_print_help(FILE *f,
 
 void magot_print_error(FILE *f, magot_parser_t *parser);
 
+void magot_unset(magot_t *opt);
+
+bool magot_is_flag(magot_t *opt);
+
+void magot_set_arg_name(magot_t *opt, char *name);
+
+char *magot_long_name(magot_t *opt);
+
+char *magot_short_name(magot_t *opt);
+
+char *magot_name(magot_t *opt);
+
+char *magot_value(magot_t *opt);
+
+void magot_set_style(magot_parser_t *p, magot_style_t style);
+
+magot_style_t magot_get_style(magot_parser_t *p);
+
+void magot_set_remaining(magot_parser_t *p, char **rem);
+
+int magot_remaining_size(magot_parser_t *p);
+
+void magot_set_offset(magot_parser_t *p, int offset);
+
+char *magot_err_arg(magot_parser_t *p);
+
+magot_errtype_t magot_err_type(magot_parser_t *p);
+
+int magot_args_size(magot_parser_t *p);
+
 #endif /* MAGOT_H */

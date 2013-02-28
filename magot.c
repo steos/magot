@@ -237,3 +237,64 @@ void magot_print_error(FILE *f, magot_parser_t *parser) {
       assert(false && "err type not handled");
   }
 }
+
+void magot_unset(magot_t *opt) {
+  opt->value = NULL;
+}
+
+bool magot_is_flag(magot_t *opt) {
+  return opt->flag;
+}
+
+void magot_set_arg_name(magot_t *opt, char *name) {
+  opt->arg_name = name;
+}
+
+char *magot_long_name(magot_t *opt) {
+  return opt->name;
+}
+
+char *magot_short_name(magot_t *opt) {
+  return opt->short_name;
+}
+
+char *magot_name(magot_t *opt) {
+  return str_empty(opt->name) ? opt->short_name : opt->name;
+}
+
+char *magot_value(magot_t *opt) {
+  return opt->value;
+}
+
+void magot_set_style(magot_parser_t *p, magot_style_t style) {
+  p->style = style;
+}
+
+magot_style_t magot_get_style(magot_parser_t *p) {
+  return p->style;
+}
+
+void magot_set_remaining(magot_parser_t *p, char **rem) {
+  p->remaining = rem;
+}
+
+int magot_remaining_size(magot_parser_t *p) {
+  return p->rem_count;
+}
+
+void magot_set_offset(magot_parser_t *p, int offset) {
+  assert(offset >= 0 && "parser offset must be >= 0");
+  p->offset = offset;
+}
+
+char *magot_err_arg(magot_parser_t *p) {
+  return p->err_arg;
+}
+
+magot_errtype_t magot_err_type(magot_parser_t *p) {
+  return p->err_type;
+}
+
+int magot_args_size(magot_parser_t *p) {
+  return p->argc - p->offset;
+}

@@ -27,10 +27,10 @@ void print_usage(int optc, magot_t **optv, magot_style_t style) {
 }
 
 char *opt_value_str(magot_t *opt) {
-  if (opt->flag) {
+  if (magot_is_flag(opt)) {
     return magot_isset(opt) ? "true" : "false";
   } else {
-    return magot_isset(opt) ? opt->value : "N/A";
+    return magot_isset(opt) ? magot_value(opt) : "N/A";
   }
 }
 
@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
   int optc = sizeof(opts) / sizeof(opts[0]);
 
   // customize the argument name used in the help output
-  foo.arg_name = "file";
+  magot_set_arg_name(&foo, "file");
 
   magot_parser_t parser;
   magot_parser(&parser, argc, argv);
@@ -77,15 +77,15 @@ int main(int argc, char **argv) {
   // If you don't assign this array then no remaining
   // arguments will be collected and magot will fail
   // if it encounters them.
-  char *remaining[parser.argc - parser.offset];
-  parser.remaining = remaining;
+  char *remaining[magot_args_size(&parser)];
+  magot_set_remaining(&parser, remaining);
 
   // the opt style defaults to MAGOT_STYLE_POSIX
-  // parser.style = MAGOT_STYLE_GNU
+  // magot_set_style(&parser, MAGOT_STYLE_GNU);
 
   if (argc == 1) {
     // print usage if we have no args
-    print_usage(optc, opts, parser.style);
+    print_usage(optc, opts, magot_get_style(&parser));
     return 0;
   }
 
@@ -93,22 +93,21 @@ int main(int argc, char **argv) {
   if (!success) {
     fputs("Error: ", stdout);
     magot_print_error(stdout, &parser);
-    print_usage(optc, opts, parser.style);
+    print_usage(optc, opts, magot_get_style(&parser));
     return 1;
   }
 
   // dump our results
   for (int i = 0; i < optc; ++i) {
     magot_t *opt = opts[i];
-    printf("%s: <%s>\n",
-           EMPTY(opt->name) ? opt->short_name : opt->name,
-           opt_value_str(opt));
+    printf("%s: <%s>\n", magot_name(opt), opt_value_str(opt));
   }
-  if (parser.rem_count > 0) {
+  int rem_size = magot_remaining_size(&parser);
+  if (rem_size > 0) {
     fputs("remaining args: ", stdout);
-    for (int i = 0; i < parser.rem_count; ++i) {
-      fprintf(stdout, "'%s'", parser.remaining[i]);
-      if (i + 1 < parser.rem_count) {
+    for (int i = 0; i < rem_size; ++i) {
+      fprintf(stdout, "'%s'", remaining[i]);
+      if (i + 1 < rem_size) {
         fputs(", ", stdout);
       }
     }
