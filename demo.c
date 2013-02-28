@@ -89,11 +89,13 @@ int main(int argc, char **argv) {
   // magot_allow_mixed(&parser, false);
 
   // If you want to collect remaining arguments allocate
-  // an array that's at least parser.argc - parser.offset big.
+  // an array that's at least as big as the number of args you
+  // want to parse. You can get this size by just calling
+  // magot_args_size after the parser is initialized.
+  char *remaining[magot_args_size(&parser)];
   // If you don't assign this array then no remaining
   // arguments will be collected and magot will fail
-  // if it encounters them.
-  char *remaining[magot_args_size(&parser)];
+  // if it encounters an unknown option.
   magot_set_remaining(&parser, remaining);
 
   // the opt style defaults to MAGOT_STYLE_POSIX
