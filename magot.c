@@ -42,6 +42,8 @@ magot_t *magot_init(magot_t *opt,
          && "option must have non-empty name");
   assert((str_empty(short_name) || strlen(short_name) == 1)
          && "short name must be a single character or empty");
+  assert((str_empty(name) || strlen(name) > 1)
+	 && "long name must be more than one character long");
   opt->name = name;
   opt->short_name = short_name;
   opt->flag = flag;
@@ -52,12 +54,9 @@ magot_t *magot_init(magot_t *opt,
   return opt;
 }
 
-magot_t *magot_flag(magot_t *opt,
-                    char *name,
-                    char *short_name,
-                    char *help) {
-  return magot_init(opt, name, short_name,
-                    true, false, help);
+magot_t *magot_flag(magot_t *opt, char *name,
+		    char *short_name, char *help) {
+  return magot_init(opt, name, short_name, true, false, help);
 }
 
 magot_t *magot_opt(magot_t *opt,
@@ -65,8 +64,7 @@ magot_t *magot_opt(magot_t *opt,
                    char *short_name,
                    bool required,
                    char *help) {
-  return magot_init(opt, name, short_name,
-                    false, required, help);
+  return magot_init(opt, name, short_name, false, required, help);
 }
 
 bool args_last(magot_parser_t *a) {
@@ -76,15 +74,16 @@ char *args_get(magot_parser_t *a) {
   assert(a->offset < a->argc);
   return a->argv[a->offset];
 }
-void args_next(magot_parser_t *a) {
-  a->offset++;
-}
 bool args_done(magot_parser_t *a) {
   return a->offset >= a->argc;
 }
-
+bool args_next(magot_parser_t *a) {
+  a->offset++;
+  return args_done(a);
+}
 char *args_get_next(magot_parser_t *a) {
-  args_next(a);
+  bool done = args_next(a);
+  assert(!done && "no more args");
   return args_get(a);
 }
 
@@ -95,11 +94,6 @@ bool match_short_name(magot_t *opt, char *str) {
 bool match_long_name(magot_t *opt, char *str) {
   return !str_empty(opt->name)
     && strcmp(opt->name, str) == 0;
-}
-
-bool match_any_name(magot_t *opt, char *str) {
-  return match_long_name(opt, str)
-    || match_short_name(opt, str);
 }
 
 magot_t *find_opt(int optc, magot_t **opts, char *name,
