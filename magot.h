@@ -50,36 +50,36 @@ typedef struct {
 } magot_t;
 
 void magot_parser(magot_parser_t *parser,
-		  int argc,
-		  char **argv);
+                  int argc,
+                  char **argv);
 
 magot_t *magot_init(magot_t *opt,
-		    char *name,
-		    char *short_name,
-		    bool flag,
-		    bool required,
-		    char *help);
+                    char *name,
+                    char *short_name,
+                    bool flag,
+                    bool required,
+                    char *help);
 
 magot_t *magot_opt(magot_t *opt,
-		   char *name,
-		   char *short_name,
-		   bool required,
-		   char *help);
+                   char *name,
+                   char *short_name,
+                   bool required,
+                   char *help);
 
 magot_t *magot_flag(magot_t *opt,
-		    char *name,
-		    char *short_name,
-		    char *help);
+                    char *name,
+                    char *short_name,
+                    char *help);
 
 bool magot_parse(int optc, magot_t **optv,
-		 magot_parser_t *parser);
+                 magot_parser_t *parser);
 
 bool magot_isset(magot_t *opt);
 
 void magot_print_help(FILE *f,
-		      int optc,
-		      magot_t **optv,
-		      magot_style_t style);
+                      int optc,
+                      magot_t **optv,
+                      magot_style_t style);
 
 void magot_print_error(FILE *f, magot_parser_t *parser);
 

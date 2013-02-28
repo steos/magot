@@ -42,9 +42,9 @@ int main(int argc, char **argv) {
     // long name and short name, the boolean specifies whether
     // the opt is required and the last string is the help text.
     magot_opt(&foo, "foo", "f", true,
-	      "the foo option. 'tis required."),
+              "the foo option. 'tis required."),
     magot_opt(&bar, "bar", "b", false,
-	      "the bar option. 'tis optional."),
+              "the bar option. 'tis optional."),
     // flags obviously can't be mandatory so there's
     // no required parameter
     magot_flag(&baz, "baz", "z", "a useless flag"),
@@ -101,15 +101,15 @@ int main(int argc, char **argv) {
   for (int i = 0; i < optc; ++i) {
     magot_t *opt = opts[i];
     printf("%s: <%s>\n",
-	   EMPTY(opt->name) ? opt->short_name : opt->name,
-	   opt_value_str(opt));
+           EMPTY(opt->name) ? opt->short_name : opt->name,
+           opt_value_str(opt));
   }
   if (parser.rem_count > 0) {
     fputs("remaining args: ", stdout);
     for (int i = 0; i < parser.rem_count; ++i) {
       fprintf(stdout, "'%s'", parser.remaining[i]);
       if (i + 1 < parser.rem_count) {
-	fputs(", ", stdout);
+        fputs(", ", stdout);
       }
     }
     puts("");
