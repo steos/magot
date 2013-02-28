@@ -70,7 +70,23 @@ int main(int argc, char **argv) {
   // By default magot starts to parse at the second arg
   // i.e. it ignores the first argument.
   // you can control this by changing the value of
-  // parser.offset which defaults to 1.
+  // the parse offset which defaults to 1.
+  // magot_set_offset(&parser, 2);
+
+  // disable mixing of options and remaining arguments
+  // When mixing is disabled and magot encounters an
+  // unknown option (i.e. remaining arg) it will not
+  // consider the subsequent args as options and instead
+  // just collect them as remaining args.
+  // By default mixing is enabled.
+  // Example:
+  //    ./demo asdf -f thefoo blub
+  // will work fine with mixing enabled and give us "asdf" and
+  // "blub" as remaining args and "thefoo" as value for "--foo".
+  // But if we disable mixing it will complain that "--foo"
+  // was not specified.
+  //
+  // magot_allow_mixed(&parser, false);
 
   // If you want to collect remaining arguments allocate
   // an array that's at least parser.argc - parser.offset big.

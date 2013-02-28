@@ -37,6 +37,7 @@ typedef struct {
   char **remaining;
   magot_errtype_t err_type;
   char *err_arg;
+  bool mixed;
 } magot_parser_t;
 
 typedef struct {
@@ -112,5 +113,7 @@ char *magot_err_arg(magot_parser_t *p);
 magot_errtype_t magot_err_type(magot_parser_t *p);
 
 int magot_args_size(magot_parser_t *p);
+
+void magot_allow_mixed(magot_parser_t *p, bool mixed);
 
 #endif /* MAGOT_H */

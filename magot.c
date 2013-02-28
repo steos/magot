@@ -28,6 +28,7 @@ void magot_parser(magot_parser_t *parser, int argc, char **argv) {
   parser->remaining = NULL;
   parser->style = MAGOT_STYLE_POSIX;
   parser->err_arg = NULL;
+  parser->mixed = true;
 }
 
 magot_t *magot_init(magot_t *opt,
@@ -147,12 +148,12 @@ bool magot_parse(int optc, magot_t **optv, magot_parser_t *parser) {
     bool valid_opt = len > 1 && arg[0] == '-';
     bool long_opt = valid_opt &&
       ((posix && arg[1] == '-') || (!posix && len > 2));
-    if (!valid_opt) {
-      if (parser->remaining != NULL) {
-        parser->remaining[parser->rem_count++] = arg;
-      } else {
-        return error(parser, MAGOT_ERR_UNKNOWN_OPT, arg);
-      }
+    if (!valid_opt && parser->remaining == NULL) {
+      return error(parser, MAGOT_ERR_UNKNOWN_OPT, arg);
+    } else if (!valid_opt && parser->mixed) {
+      parser->remaining[parser->rem_count++] = arg;
+    } else if (!valid_opt) {
+      break;
     } else if (posix && !long_opt && len > 2) {
       if (!process_cluster(arg, len, optc, optv, parser)) {
         return false;
@@ -172,6 +173,9 @@ bool magot_parse(int optc, magot_t **optv, magot_parser_t *parser) {
         return false;
       }
     }
+  }
+  for (; !args_done(parser); args_next(parser)) {
+    parser->remaining[parser->rem_count++] = args_get(parser);
   }
   for (int i = 0; i < optc; ++i) {
     magot_t *opt = optv[i];
@@ -297,4 +301,8 @@ magot_errtype_t magot_err_type(magot_parser_t *p) {
 
 int magot_args_size(magot_parser_t *p) {
   return p->argc - p->offset;
+}
+
+void magot_allow_mixed(magot_parser_t *p, bool mixed) {
+  p->mixed = mixed;
 }
